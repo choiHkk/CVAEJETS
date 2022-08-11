@@ -1,0 +1,19 @@
+path:
+  ckpt_path: "./output/ckpt/kss"
+  log_path: "./output/log/kss"
+  result_path: "./output/result/kss"
+optimizer:
+  batch_size: 16
+  betas: [0.8, 0.99]
+  eps: 0.000000001
+  learning_rate: 0.0002
+  lr_decay: 0.999
+step:
+  total_step: 300000
+  log_step: 1
+  val_step: 1000
+  save_step: 1000
+duration:
+  binarization_start_steps: 6000
+  binarization_loss_enable_steps: 18000
+  binarization_loss_warmup_steps: 10000

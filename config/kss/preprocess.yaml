@@ -1,0 +1,41 @@
+dataset: "kss"
+
+path:
+  corpus_path: "/home/choihk/work/JETS/kss"
+  raw_path: "/home/choihk/work/JETS/kss/transcript.v.1.2.txt"
+  preprocessed_path: "./preprocessed_data/kss"
+  training_files: "./preprocessed_data/kss/train.txt"
+  validation_files: "./preprocessed_data/kss/val.txt"
+
+preprocessing:
+  val_size: 512
+  duration:
+    beta_binomial_scaling_factor: 1
+  text:
+    text_cleaners: ["korean_cleaners"]
+    language: "ko"
+    use_intersperse: False
+  audio:
+    trim_top_db: 35
+    trim_frame_length: 6000
+    trim_hop_length: 200
+    sampling_rate: 22050
+    max_wav_value: 32768.0
+  stft:
+    filter_length: 1024
+    hop_length: 256
+    win_length: 1024
+  mel:
+    n_mel_channels: 80
+    mel_fmin: 0
+    mel_fmax: 11025
+  pitch:
+    feature: "frame_level" 
+    normalization: True
+    cwt_scales: -1
+    pitch_norm: "log" 
+    pitch_norm_eps: 0.000000001
+    use_uv: True
+  energy:
+    feature: "frame_level" 
+    normalization: True
