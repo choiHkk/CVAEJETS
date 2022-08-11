@@ -35,7 +35,7 @@ def evaluate(models, step, configs, device, logger=None):
     )
 
     # Get loss function
-    Loss = VAEJETSLoss(preprocess_config, model_config, train_config).to(device)
+    Loss = CVAEJETSLoss(preprocess_config, model_config, train_config).to(device)
 
     # Evaluation
     loss_sums_disc = [0 for _ in range(1)] # + total
