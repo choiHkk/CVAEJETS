@@ -143,7 +143,7 @@ class SynthesizerLoss(nn.Module):
         wav_predictions = wav_predictions.squeeze(1)
         wav_targets = wav_targets.squeeze(1)
         assert wav_predictions.size() == wav_targets.size()
-        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * 20.
+        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * 45.
         
         # mel_predictions = self.get_mel(wav_predictions)[...,:indices[1]-indices[0]]
         # mel_targets = mel_targets[...,indices[0]:indices[1]]

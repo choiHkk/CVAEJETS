@@ -14,7 +14,7 @@ preprocessing:
   text:
     text_cleaners: ["korean_cleaners"]
     language: "ko"
-    use_intersperse: False
+    use_intersperse: True
   audio:
     trim_top_db: 35
     trim_frame_length: 6000
