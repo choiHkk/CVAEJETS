@@ -1,8 +1,8 @@
 dataset: "kss"
 
 path:
-  corpus_path: "/home/choihk/work/JETS/kss"
-  raw_path: "/home/choihk/work/JETS/kss/transcript.v.1.2.txt"
+  corpus_path: "/home/choihk/work/CVAEJETS/kss"
+  raw_path: "/home/choihk/work/CVAEJETS/kss/transcript.v.1.2.txt"
   preprocessed_path: "./preprocessed_data/kss"
   training_files: "./preprocessed_data/kss/train.txt"
   validation_files: "./preprocessed_data/kss/val.txt"
