@@ -28,13 +28,13 @@
 2. `cd /home/work/CVAEJETS`
 5. `ln -s /home/work/CVAEJETS/data/dataset/kss`
 6. `python preprocess.py ./config/kss/preprocess.yaml`
-7. `python train.py -p ./config/kss/preprocess.yaml -s ./config/kss/model.yaml -g ./config/kss/config_v1.json -t ./config/kss/train.yaml`
-8. arguments
+7. `python train.py -p ./config/kss/preprocess.yaml -m ./config/kss/model.yaml -t ./config/kss/train.yaml`
+8. `python train.py --restore_step <checkpoint step number> -p ./config/kss/preprocess.yaml -m ./config/kss/model.yaml -t ./config/kss/train.yaml`
+9. arguments
   * -p : preprocess config path
-  * -s : synthesizer config path
-  * -g : generator config path
+  * -m : model config path
   * -t : train config path
-9. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
+10. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
 ## Tensorboard losses
 ![CVAEJETS-tensorboard-losses1](https://user-images.githubusercontent.com/69423543/184278564-3bcb3bd2-98be-47f4-8aa6-e4381f7415ef.png)
