@@ -50,6 +50,7 @@
 2. [JETS: Jointly Training FastSpeech2 and HiFi-GAN for End to End Text to Speech](https://arxiv.org/abs/2203.16852)
 3. [Comprehensive-Transformer-TTS](https://github.com/keonlee9420/Comprehensive-Transformer-TTS)
 4. [Comprehensive-E2E-TTS](https://github.com/keonlee9420/Comprehensive-E2E-TTS)
+5. [Conformer](https://github.com/sooftware/conformer) - [paper](https://arxiv.org/abs/2005.08100)
 5. [FastSpeech2](https://github.com/ming024/FastSpeech2)
 6. [HiFi-GAN](https://github.com/jik876/hifi-gan)
 7. [VAEJETS](https://github.com/choiHkk/VAEJETS)
