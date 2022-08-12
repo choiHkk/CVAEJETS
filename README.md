@@ -1,7 +1,7 @@
 ## Introduction
 1. FastSpeech2, HiFi-GAN, VITS, Conformer 오픈 소스를 활용하여 JETS(End-To-End)를 간단 구현하고 한국어 데이터셋(KSS)을 사용해 빠르게 학습합니다.
 2. Adversarial Training에서 Discriminator는 VITS에서 사용한 모듈을 그대로 사용합니다.
-3. 효과적인 Alignment Learning을 위해 Text Sequence 내부 Black Token을 추가합니다. 
+3. 효과적인 Alignment Learning을 위해 Text Sequence 내부 blank token을 추가합니다. 
 4. 본 레포지토리에서 HiFi-GAN에서 제안하는 l1 reconstructure loss(only log mel magnitude)를 그대로 사용하면 adversarial loss에서 issue가 발생합니다. 따라서 log stft magnitude와 l1 norm이 같이 계산되는 stft loss로 대체했습니다.
 5. 확장성을 위하여 기존 FastSpeech2 구조에서 Decoder 대신 VITS의 Normalizing Flows(CouplingLayer)를 사용하였습니다. 따라서 Posterior Encoder도 같이 사용됩니다. (Quality 향상, Voice Conversion 목적)
 6. 기존 Posterior Encoder는 Linear Spectrogram을 입력값으로 사용하지만, 본 레포지토리에서는 Mel Spectrogram을 사용합니다.
