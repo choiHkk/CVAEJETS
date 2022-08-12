@@ -17,3 +17,9 @@ duration:
   binarization_start_steps: 6000
   binarization_loss_enable_steps: 18000
   binarization_loss_warmup_steps: 10000
+loss:
+  stft:
+    c_stft: 20
+    fft_sizes: [1024, 2048, 512]
+    hop_sizes: [128, 256, 64]
+    win_lengths: [1024, 2048, 512]

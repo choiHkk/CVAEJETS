@@ -35,15 +35,16 @@ class SynthesizerLoss(nn.Module):
         self.sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
         self.filter_length = preprocess_config["preprocessing"]["stft"]["filter_length"]
         self.hop_length = preprocess_config["preprocessing"]["stft"]["hop_length"]
+        self.c_stft = train_config["loss"]["stft"]["c_stft"]
         
         self.pitch_feature_level = preprocess_config["preprocessing"]["pitch"]["feature"]
         self.energy_feature_level = preprocess_config["preprocessing"]["energy"]["feature"]
         self.binarization_loss_enable_steps = train_config['duration']['binarization_loss_enable_steps']
         self.binarization_loss_warmup_steps = train_config['duration']['binarization_loss_warmup_steps']
         self.stft_loss_fn = MultiResolutionSTFTLoss(
-            [1024, 2048, 512],
-            [128, 256, 64],
-            [1024, 2048, 512],
+            fft_sizes=train_config["loss"]["stft"]["fft_sizes"],
+            hop_sizes=train_config["loss"]["stft"]["hop_sizes"],
+            win_lengths=train_config["loss"]["stft"]["win_lengths"],
         )
         self.mse_loss = nn.MSELoss()
         self.mae_loss = nn.L1Loss()
@@ -143,7 +144,7 @@ class SynthesizerLoss(nn.Module):
         wav_predictions = wav_predictions.squeeze(1)
         wav_targets = wav_targets.squeeze(1)
         assert wav_predictions.size() == wav_targets.size()
-        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * 20.
+        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * self.c_stft
         
         # mel_predictions = self.get_mel(wav_predictions)[...,:indices[1]-indices[0]]
         # mel_targets = mel_targets[...,indices[0]:indices[1]]
