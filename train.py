@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from utils.model import get_model, get_param_num
-from utils.tools import to_device, log, clip_grad_value_, AttrDict
+from utils.tools import to_device, log, clip_grad_value_
 from model import CVAEJETSLoss
 from data_utils import AudioTextDataset, AudioTextCollate, DataLoader, DistributedBucketSampler
 from evaluate import evaluate
