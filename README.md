@@ -37,12 +37,12 @@
 10. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
 
 ## Tensorboard losses
-![CVAEJETS-tensorboard-losses1](https://user-images.githubusercontent.com/69423543/184588325-284e8e9b-1894-4fb3-80a8-74091e9e2369.png)
-![CVAEJETS-tensorboard-losses2](https://user-images.githubusercontent.com/69423543/184588336-7485dc0b-4315-4160-93fa-2c22aa3215af.png)
+![CVAEJETS-tensorboard-losses1](https://user-images.githubusercontent.com/69423543/184790465-ac09988c-1685-4f6d-b3c7-a5458596d348.png)
+![CVAEJETS-tensorboard-losses2](https://user-images.githubusercontent.com/69423543/184790469-60a181fb-1d79-4bc7-bac8-caf443871f78.png)
 
 
 ## Tensorboard Stats
-![CVAEJETS-tensorboard-stats](https://user-images.githubusercontent.com/69423543/184588341-8831242a-8e1e-49b0-a6f2-4d1c33a5e074.png)
+![CVAEJETS-tensorboard-stats](https://user-images.githubusercontent.com/69423543/184790478-551f543b-f002-40ba-bd08-a36ce07277c8.png)
 
 
 ## Reference
