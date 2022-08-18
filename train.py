@@ -5,10 +5,11 @@ import torch
 import yaml
 import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
+from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
 from utils.model import get_model, get_param_num
-from utils.tools import to_device, log, clip_grad_value_
+from utils.tools import to_device, log, clip_grad_value_, AttrDict
 from model import CVAEJETSLoss
 from data_utils import AudioTextDataset, AudioTextCollate, DataLoader, DistributedBucketSampler
 from evaluate import evaluate
@@ -54,6 +55,8 @@ def main(args, configs):
      epoch) = get_model(
         args, configs, device, train=True)
     
+    scaler = GradScaler(enabled=train_config["fp16_run"])
+    
     model = nn.DataParallel(model)
     discriminator = nn.DataParallel(discriminator)
     model_num_param = get_param_num(model)
@@ -88,40 +91,47 @@ def main(args, configs):
         for batch in loader:
             batch = to_device(batch, device)
             
-            output = model(*(batch[:-1]), step=step, gen=False)
+            with autocast(enabled=train_config["fp16_run"]):
+                output = model(*(batch[:-1]), step=step, gen=False)
 
-            # wav_predictions, wav_targets, indices
-            wav_predictions, indices = output[0], output[7]
-            wav_targets = batch[-1].unsqueeze(1)[...,indices[0]*hop_size:indices[1]*hop_size]
+                # wav_predictions, wav_targets, indices
+                wav_predictions, indices = output[0], output[7]
+                wav_targets = batch[-1].unsqueeze(1)[...,indices[0]*hop_size:indices[1]*hop_size]
 
-            # Discriminator
-            y_d_hat_r, y_d_hat_g, _, _ = discriminator(wav_targets, wav_predictions.detach())
-
-            loss_disc, losses_disc = Loss.disc_loss_fn(
-                disc_real_outputs=y_d_hat_r, disc_generated_outputs=y_d_hat_g)
+                # Discriminator
+                y_d_hat_r, y_d_hat_g, _, _ = discriminator(wav_targets, wav_predictions.detach())
+                
+                with autocast(enabled=False):
+                    loss_disc, losses_disc = Loss.disc_loss_fn(
+                        disc_real_outputs=y_d_hat_r, disc_generated_outputs=y_d_hat_g)
 
             # Discriminator Backward
             discriminator_optimizer.zero_grad()
-            loss_disc.backward()
+            scaler.scale(loss_disc).backward()
+            scaler.unscale_(discriminator_optimizer)
             grad_norm_discriminator = clip_grad_value_(discriminator.parameters(), None)
-            discriminator_optimizer.step()
+            scaler.step(discriminator_optimizer)
             
-            # Generator
-            y_d_hat_r, y_d_hat_g, fmap_r, fmap_g = discriminator(wav_targets, wav_predictions)
-
-            loss_model, losses_model = Loss.gen_loss_fn(
-                inputs=batch, 
-                predictions=output, 
-                step=step, 
-                disc_outputs=y_d_hat_g, 
-                fmap_r=fmap_r, 
-                fmap_g=fmap_g)
+            with autocast(enabled=train_config["fp16_run"]):
+                # Generator
+                y_d_hat_r, y_d_hat_g, fmap_r, fmap_g = discriminator(wav_targets, wav_predictions)
+                
+                with autocast(enabled=False):
+                    loss_model, losses_model = Loss.gen_loss_fn(
+                        inputs=batch, 
+                        predictions=output, 
+                        step=step, 
+                        disc_outputs=y_d_hat_g, 
+                        fmap_r=fmap_r, 
+                        fmap_g=fmap_g)
                     
             # Generator Backward
             model_optimizer.zero_grad()
-            loss_model.backward()
+            scaler.scale(loss_model).backward()
+            scaler.unscale_(model_optimizer)
             grad_norm_model = clip_grad_value_(model.parameters(), None)
-            model_optimizer.step()
+            scaler.step(model_optimizer)
+            scaler.update()
             
             if step % log_step == 0:
                 lr = model_optimizer.param_groups[0]['lr']
