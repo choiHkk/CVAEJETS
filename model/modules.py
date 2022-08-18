@@ -100,7 +100,7 @@ class VarianceAdaptor(nn.Module):
         f0_denorm = f0_denorm * control
         pitch = pitch_utils.f0_to_coarse(f0_denorm) 
         embedding = self.pitch_embedding(pitch)
-        prediction = [cwt, cwt_mean, cwt_std]
+        prediction = [cwt, cwt_mean, cwt_std, pitch]
         return prediction, embedding
 
     def get_energy_embedding(self, x, target, mask, control, g=None):

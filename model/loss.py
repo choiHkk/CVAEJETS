@@ -119,7 +119,7 @@ class SynthesizerLoss(nn.Module):
         mel_targets.requires_grad = False
         wav_targets.requires_grad = False
         
-        (cwt_spec_predictions, cwt_mean_predictions, cwt_std_predictions) = pitch_predictions
+        (cwt_spec_predictions, cwt_mean_predictions, cwt_std_predictions, _) = pitch_predictions
         cwt_spec_predictions, uv_predictions = cwt_spec_predictions[:, :, :10], cwt_spec_predictions[:,:,-1]
         
         cwt_spec_loss = self.mse_loss(cwt_spec_predictions, cwt_spec_targets)
