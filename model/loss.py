@@ -35,19 +35,20 @@ class SynthesizerLoss(nn.Module):
         self.sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
         self.filter_length = preprocess_config["preprocessing"]["stft"]["filter_length"]
         self.hop_length = preprocess_config["preprocessing"]["stft"]["hop_length"]
-        self.c_stft = train_config["loss"]["stft"]["c_stft"]
         
         self.pitch_feature_level = preprocess_config["preprocessing"]["pitch"]["feature"]
         self.energy_feature_level = preprocess_config["preprocessing"]["energy"]["feature"]
         self.binarization_loss_enable_steps = train_config['duration']['binarization_loss_enable_steps']
         self.binarization_loss_warmup_steps = train_config['duration']['binarization_loss_warmup_steps']
         self.stft_loss_fn = MultiResolutionSTFTLoss(
-            fft_sizes=train_config["loss"]["stft"]["fft_sizes"],
-            hop_sizes=train_config["loss"]["stft"]["hop_sizes"],
-            win_lengths=train_config["loss"]["stft"]["win_lengths"],
+            [1024, 2048, 512],
+            [128, 256, 64],
+            [1024, 2048, 512],
         )
         self.mse_loss = nn.MSELoss()
         self.mae_loss = nn.L1Loss()
+        # self.mse_loss = MSELoss()
+        # self.mae_loss = MAELoss()
         self.sum_loss = ForwardSumLoss()
         self.bin_loss = BinLoss()
         self.kld = KLDivergence()
@@ -121,7 +122,7 @@ class SynthesizerLoss(nn.Module):
         (cwt_spec_predictions, cwt_mean_predictions, cwt_std_predictions) = pitch_predictions
         cwt_spec_predictions, uv_predictions = cwt_spec_predictions[:, :, :10], cwt_spec_predictions[:,:,-1]
         
-        cwt_spec_loss = self.mae_loss(cwt_spec_predictions, cwt_spec_targets)
+        cwt_spec_loss = self.mse_loss(cwt_spec_predictions, cwt_spec_targets)
         cwt_mean_loss = self.mse_loss(cwt_mean_predictions, cwt_mean_targets)
         cwt_std_loss = self.mse_loss(cwt_std_predictions, cwt_std_targets)
         
@@ -144,7 +145,7 @@ class SynthesizerLoss(nn.Module):
         wav_predictions = wav_predictions.squeeze(1)
         wav_targets = wav_targets.squeeze(1)
         assert wav_predictions.size() == wav_targets.size()
-        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * self.c_stft
+        stft_loss = self.stft_loss_fn(wav_predictions, wav_targets) * 20.
         
         # mel_predictions = self.get_mel(wav_predictions)[...,:indices[1]-indices[0]]
         # mel_targets = mel_targets[...,indices[0]:indices[1]]
@@ -160,7 +161,7 @@ class SynthesizerLoss(nn.Module):
                 (step-self.binarization_loss_enable_steps) / self.binarization_loss_warmup_steps, 1.0) * 1.0
         bin_loss = self.bin_loss(hard_attention=attn_hard, soft_attention=attn_soft) * bin_loss_weight
         
-        energy_loss = self.mae_loss(energy_predictions, energy_targets)
+        energy_loss = self.mse_loss(energy_predictions, energy_targets)
         duration_loss = self.mse_loss(log_duration_predictions, log_duration_targets)
         
         kl_loss = self.kld(z_p, m_p, logs_p, logs_q, mel_masks.unsqueeze(1))
@@ -265,6 +266,22 @@ class KLDivergence(nn.Module):
         
     def forward(self, z_p, logs_q, m_p, logs_p, z_mask):
         return kl_loss(z_p, logs_q, m_p, logs_p, z_mask)
+    
+    
+class MSELoss(nn.Module):
+    def __init__(self, ):
+        super().__init__()
+        
+    def forward(self, prediction, target):
+        return (prediction - target).pow(2).mean()
+    
+    
+class MAELoss(torch.nn.Module):
+    def __init__(self, ):
+        super().__init__()
+        
+    def forward(self, prediction, target):
+        return (prediction - target).abs().mean()
     
     
 def feature_loss(fmap_r, fmap_g):
